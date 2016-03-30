@@ -67,12 +67,11 @@ static const NSInteger paddingLenth = 30;
     
     [info enumerateLinesUsingBlock:^(NSString *line, BOOL *stop) {
         if ([line isEqualToString:@""]) {
-            if (streamName) {
-                [self.streamNames addObject:streamName];
-                [self.streamsOrder setValue:currStreamOrder forKey:streamName];
-                [self.streamsInfo setValue:currStreamInfo forKey:streamName];
-                streamName = nil;
-            }
+            if (!streamName) return;
+            [self.streamNames addObject:streamName];
+            [self.streamsOrder setValue:currStreamOrder forKey:streamName];
+            [self.streamsInfo setValue:currStreamInfo forKey:streamName];
+            streamName = nil;
         } else {
             NSArray *components = [line componentsSeparatedByString:@": "];
             if (components.count == 1) {
@@ -98,34 +97,34 @@ static const NSInteger paddingLenth = 30;
     return (_streamNames != nil) ? _streamNames : @[];
 }
 
-- (NSDictionary<NSString *, NSString *> *)valuesForStreamKey:(NSString *)streamKey {
-    return (self.streamsInfo[streamKey]) ?: @{};
+- (NSDictionary<NSString *, NSString *> *)valuesOfStream:(NSString *)streamKey {
+    return self.streamsInfo[streamKey] ?: @{};
 }
 
 - (NSDictionary *)streams {
     NSMutableDictionary *streams = [NSMutableDictionary dictionary];
     for (NSString *streamKey in self.streamKeys) {
-        NSDictionary *streamInfo = [self valuesForStreamKey:streamKey];
+        NSDictionary *streamInfo = [self valuesOfStream:streamKey];
         [streams setObject:streamInfo forKey:streamKey];
     }
     return streams;
 }
 
-- (NSInteger)countOfValuesForStreamKey:(NSString *)streamKey {
-    return [self valuesForStreamKey:streamKey].count;
+- (NSInteger)valuesCountOfStream:(NSString *)streamKey {
+    return [self valuesOfStream:streamKey].count;
 }
 
-- (nullable NSString *)keyAtIndex:(NSInteger)index forStreamKey:(NSString *)streamKey {
+- (nullable NSString *)keyAtIndex:(NSInteger)index ofStream:(NSString *)streamKey {
     return [self.streamsOrder objectForKey:streamKey][index];
 }
 
-- (nullable NSString *)valueAtIndex:(NSInteger)index forStreamKey:(NSString *)streamKey {
-    NSString *key = [self keyAtIndex:index forStreamKey:streamKey];
-    return [self valueForKey:key streamKey:streamKey];
+- (nullable NSString *)valueAtIndex:(NSInteger)index ofStream:(NSString *)streamKey {
+    NSString *key = [self keyAtIndex:index ofStream:streamKey];
+    return [self valueForKey:key ofStream:streamKey];
 }
 
-- (nullable NSString *)valueForKey:(NSString *)infoKey streamKey:(NSString *)streamKey {
-    return [self valuesForStreamKey:streamKey][infoKey];
+- (nullable NSString *)valueForKey:(NSString *)infoKey ofStream:(NSString *)streamKey {
+    return [self valuesOfStream:streamKey][infoKey];
 }
 
 #pragma mark Text representation
@@ -135,7 +134,7 @@ static const NSInteger paddingLenth = 30;
 
     for (NSString *streamKey in self.streamKeys) {
         [text appendFormat:@"%@ :\n", streamKey];
-        [self enumerateValuesForStreamKey:streamKey inOrder:YES block:^(NSString *key, NSString *val) {
+        [self enumerateValuesOfStream:streamKey inOrder:YES block:^(NSString *key, NSString *val) {
             key = [key stringByPaddingToLength:paddingLenth withString:@" " startingAtIndex:0];
             [text appendFormat:@"%@ : %@\n", key, val];
         }];
@@ -157,7 +156,7 @@ static const NSInteger paddingLenth = 30;
     for (NSString *streamKey in self.streamKeys) {
         [text mik_appendAtrributes:titleAttr string:streamKey];
         [text mik_appendAtrributes:titleAttr string:@"\n"];
-        [self enumerateValuesForStreamKey:streamKey inOrder:YES block:^(NSString *key, NSString *val) {
+        [self enumerateValuesOfStream:streamKey inOrder:YES block:^(NSString *key, NSString *val) {
             key = [key stringByPaddingToLength:paddingLenth withString:@" " startingAtIndex:0];
             NSString *line = [NSString stringWithFormat:@"%@ : %@\n", key, val];
             [text mik_appendAtrributes:valueAttr string:line];
@@ -176,7 +175,7 @@ static const NSInteger paddingLenth = 30;
     NSMutableString *xmlString = [[NSMutableString alloc] init];
 
     for (NSString *streamKey in self.streamKeys) {
-        NSDictionary *streamInfo = [self valuesForStreamKey:streamKey];
+        NSDictionary *streamInfo = [self valuesOfStream:streamKey];
         [xmlString appendFormat:@"<%@>\n", streamKey];
         for (NSString *key in [streamInfo allKeys]) {
             NSString *value = streamInfo[key];
@@ -241,17 +240,17 @@ static const NSInteger paddingLenth = 30;
 
 #pragma mark Enumeration
 
-- (void)enumerateValuesForStreamKey:(NSString *)streamKey block:(MIKStreamEnumerationBlock)block {
-    [self enumerateValuesForStreamKey:streamKey inOrder:NO block:block];
+- (void)enumerateValuesOfStream:(NSString *)streamKey block:(MIKStreamEnumerationBlock)block {
+    [self enumerateValuesOfStream:streamKey inOrder:NO block:block];
 }
 
-- (void)enumerateOrderedValuesForStreamKey:(NSString *)streamKey block:(MIKStreamEnumerationBlock)block {
-    [self enumerateValuesForStreamKey:streamKey inOrder:YES block:block];
+- (void)enumerateOrderedValuesOfStream:(NSString *)streamKey block:(MIKStreamEnumerationBlock)block {
+    [self enumerateValuesOfStream:streamKey inOrder:YES block:block];
 }
 
-- (void)enumerateValuesForStreamKey:(NSString *)streamKey
-                            inOrder:(BOOL)ordered
-                              block:(MIKStreamEnumerationBlock)block
+- (void)enumerateValuesOfStream:(NSString *)streamKey
+                        inOrder:(BOOL)ordered
+                          block:(MIKStreamEnumerationBlock)block
 {
     NSDictionary *info = self.streamsInfo[streamKey];
     NSArray *keys = (ordered) ? self.streamsOrder[streamKey] : info.allKeys;
@@ -327,7 +326,9 @@ static const NSInteger paddingLenth = 30;
         case MIKFormatXML:   extension = @"xml";   break;
         case MIKFormatJSON:  extension = @"json";  break;
         case MIKFormatPLIST: extension = @"plist"; break;
-        default: break;
+        default:
+            NSLog(@"%@ %s format argument is invalid", self, __PRETTY_FUNCTION__);
+            break;
     }
     return extension;
 }
@@ -359,7 +360,8 @@ static const NSInteger paddingLenth = 30;
 }
 
 + (void)setLanguageWithContents:(NSString *)langContents {
-    MediaInfoDLL::MediaInfo::Option_Static([@"Language" mik_WCHARString], [langContents mik_WCHARString]);
+    MediaInfoDLL::MediaInfo::Option_Static([@"Language" mik_WCHARString],
+                                           [langContents mik_WCHARString]);
 }
 
 @end

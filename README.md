@@ -51,17 +51,17 @@ guard let info = MIKMediaInfo(fileURL: movieURL) else {
 
 // Get a single value for a key in constant time
 
-let value = info.valueForKey(MIKCompleteNameKey, streamKey: MIKGeneralStreamKey)
+let value = info.valueForKey(MIKCompleteNameKey, ofStream: MIKGeneralStreamKey)
 
 
 // Get a single value at an index in constant time
 
-let value = valueAtIndex(2, streamKey: MIKGeneralStreamKey)
+let value = valueAtIndex(2, ofStream: MIKGeneralStreamKey)
 
 
 // Enumerate all values by keeping the original order
 
-info.enumerateOrderedValuesForStreamKey(MIKVideoStreamKey) { key, value in
+info.enumerateOrderedValuesOfStream(MIKVideoStreamKey) { key, value in
     print("\(key) : \(value)")
 }
 

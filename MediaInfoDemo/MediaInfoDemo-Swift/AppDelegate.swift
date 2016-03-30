@@ -58,25 +58,28 @@ extension AppDelegate: NSTableViewDataSource {
             let index = self.streamsTableView.selectedRow
             if index >= 0 && index < self.mediaInfo.streamKeys.count {
                 let streamKey = self.mediaInfo.streamKeys[index]
-                return self.mediaInfo.countOfValuesForStreamKey(streamKey)
+                return self.mediaInfo.valuesCountOfStream(streamKey)
             } else {
                 return 0
             }
         }
     }
     
-    public func tableView(tableView: NSTableView, objectValueForTableColumn tableColumn: NSTableColumn?, row: Int) -> AnyObject? {
+    public func tableView(tableView: NSTableView,
+                          objectValueForTableColumn tableColumn: NSTableColumn?,
+                          row: Int) -> AnyObject?
+    {
         if tableView === self.streamsTableView {
             return self.mediaInfo.streamKeys[row]
         } else {
             let index = self.streamsTableView.selectedRow
             let streamKey = self.mediaInfo.streamKeys[index]
-            if self.mediaInfo.countOfValuesForStreamKey(streamKey) <= row {
+            if self.mediaInfo.valuesCountOfStream(streamKey) <= row {
                 return nil
             } else if tableColumn?.title == "Key" {
-                return self.mediaInfo.keyAtIndex(row, forStreamKey: streamKey)
+                return self.mediaInfo.keyAtIndex(row, ofStream: streamKey)
             } else {
-                return self.mediaInfo.valueAtIndex(row, forStreamKey: streamKey)
+                return self.mediaInfo.valueAtIndex(row, ofStream: streamKey)
             }
         }
     }

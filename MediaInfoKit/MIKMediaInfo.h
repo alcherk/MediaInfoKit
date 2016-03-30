@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @return A dictonary or nil if the stream doesn't exist.
  */
-- (NSDictionary<NSString *, NSString *> *)valuesForStreamKey:(NSString *)streamKey;
+- (NSDictionary<NSString *, NSString *> *)valuesOfStream:(NSString *)streamKey;
 
 /**
  *  Returns the value for the given key and the given stream key.
@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @return A string or nil if the key or the stream doesn't exist.
  */
-- (nullable NSString *)valueForKey:(NSString *)valueKey streamKey:(NSString *)streamKey;
+- (nullable NSString *)valueForKey:(NSString *)valueKey ofStream:(NSString *)streamKey;
 
 /**
  *  Returns the number of values for the given stream key.
@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @return The number of values.
  */
-- (NSInteger)countOfValuesForStreamKey:(NSString *)streamKey;
+- (NSInteger)valuesCountOfStream:(NSString *)streamKey;
 
 /**
  *  Returns the key at the index for the given stream key.
@@ -71,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @return The key or nil if the stream doesn't exist.
  */
-- (nullable NSString *)keyAtIndex:(NSInteger)index forStreamKey:(NSString *)streamKey;
+- (nullable NSString *)keyAtIndex:(NSInteger)index ofStream:(NSString *)streamKey;
 
 /**
  *  Returns the value at the index for the given stream key.
@@ -81,7 +81,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @return The value or nil if the stream doesn't exist.
  */
-- (nullable NSString *)valueAtIndex:(NSInteger)index forStreamKey:(NSString *)streamKey;
+- (nullable NSString *)valueAtIndex:(NSInteger)index ofStream:(NSString *)streamKey;
 
 #pragma mark Text description
 
@@ -115,7 +115,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @param format The export format.
  */
-- (nullable NSAttributedString *)attributedTextForFormat:(MIKFormat)format ;
+- (nullable NSAttributedString *)attributedTextForFormat:(MIKFormat)format;
 
 #pragma mark Enumeration
 
@@ -133,7 +133,7 @@ typedef void(^MIKStreamEnumerationBlock)(NSString *key, NSString *value);
  *  @param streamKey The key of the stream.
  *  @param block     The enumeration block.
  */
-- (void)enumerateValuesForStreamKey:(NSString *)streamKey block:(MIKStreamEnumerationBlock)block;
+- (void)enumerateValuesOfStream:(NSString *)streamKey block:(MIKStreamEnumerationBlock)block;
 
 /**
  *  Enumerates all keys and values of a stream with the original mediainfo order.
@@ -141,7 +141,7 @@ typedef void(^MIKStreamEnumerationBlock)(NSString *key, NSString *value);
  *  @param streamKey The key of the stream.
  *  @param block     The enumeration block.
  */
-- (void)enumerateOrderedValuesForStreamKey:(NSString *)streamKey block:(MIKStreamEnumerationBlock)block;
+- (void)enumerateOrderedValuesOfStream:(NSString *)streamKey block:(MIKStreamEnumerationBlock)block;
 
 #pragma mark Exportation
 
