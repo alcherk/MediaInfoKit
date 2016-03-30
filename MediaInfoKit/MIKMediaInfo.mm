@@ -14,8 +14,17 @@
 
 static const NSInteger paddingLenth = 30;
 
-#define FONT_ATTR_DICT(fn, fs) \
-    @{NSFontAttributeName:[NSFont fontWithName:fn size:fs]}
+#pragma mark - Helpers
+
+static
+NSDictionary *_MIKAttributesForFontDesc(NSString *name, CGFloat size)
+{
+    NSFont *font = [NSFont fontWithName:name size:size];
+    if (!font) {
+        font = [NSFont systemFontOfSize:size];
+    }
+    return @{NSFontAttributeName : font};
+}
 
 #pragma mark - MIKMediaInfo private
 
@@ -150,8 +159,8 @@ static const NSInteger paddingLenth = 30;
 
 - (NSAttributedString *)attributedText {
     __block NSMutableAttributedString *text = [[NSMutableAttributedString alloc] init];
-    __block NSDictionary *titleAttr = FONT_ATTR_DICT(@"Courier-Bold", 13.0);
-    __block NSDictionary *valueAttr = FONT_ATTR_DICT(@"Courier", 11.0);
+    __block NSDictionary *titleAttr = _MIKAttributesForFontDesc(@"Courier-Bold", 13.0);
+    __block NSDictionary *valueAttr = _MIKAttributesForFontDesc(@"Courier", 11.0);
     
     for (NSString *streamKey in self.streamKeys) {
         [text mik_appendAtrributes:titleAttr string:streamKey];
